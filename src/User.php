@@ -23,6 +23,11 @@ class User
     private $incomingMessages;
 
     /**
+     * @var SplObjectStorage
+     */
+    private $circleOfFriends;
+
+    /**
      * @param Nickname $nickname
      * @param Email $email
      */
@@ -32,6 +37,8 @@ class User
         $this->email = $email;
 
         $this->followers = new SplObjectStorage();
+        $this->circleOfFriends = new SplObjectStorage();
+        $this->circleOfFriends->attach($this);
     }
 
     public function publish(Message $message)
@@ -65,12 +72,24 @@ class User
         return $this->email;
     }
 
-    public function addFollower(User $user)
+    public function follow(User $user)
+    {
+        $this->circleOfFriends->attach($user);
+        $user->addFollower($this);
+    }
+
+    public function unfollow(User $user)
+    {
+        $this->circleOfFriends->detach($user);
+        $user->removeFollower($this);
+    }
+
+    private function addFollower(User $user)
     {
         $this->followers->attach($user);
     }
 
-    public function removeFollower(User $user)
+    private function removeFollower(User $user)
     {
         $this->followers->detach($user);
     }
