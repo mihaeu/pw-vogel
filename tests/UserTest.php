@@ -2,6 +2,7 @@
 
 /**
  * @covers User
+ * @covers CannotSendMessageToStrangersException
  *
  * @uses Message
  */
@@ -33,6 +34,37 @@ class UserTest extends PHPUnit_Framework_TestCase
         $sender->publish($message);
         $output = ob_get_clean();
         $this->assertEmpty($output);
+    }
+
+    public function testOutputForEmptyTimeline()
+    {
+        $user = new User($this->mockNickname(), $this->mockEmail());
+        ob_start();
+        $user->viewTimeline();
+        $output = ob_get_clean();
+        $this->assertEquals($output, 'No messages');
+    }
+
+    public function testCanViewTimeline()
+    {
+        $sender = new User($this->mockNickname(), $this->mockEmail('mocki@aol.com'));
+        $recipient = new User($this->mockNickname(), $this->mockEmail());
+        $recipient->follow($sender);
+
+        ob_start();
+        $sender->publish(new Message('Hello World'));
+        ob_clean();
+        $recipient->viewTimeline();
+        $output = ob_get_clean();
+        $this->assertRegExp('/mocki.*Hello/', $output);
+    }
+
+    public function testCannotReceiveFromUsersWhoAreNotFriends()
+    {
+        $user = new User($this->mockNickname(), $this->mockEmail());
+
+        $this->setExpectedException(CannotSendMessageToStrangersException::class);
+        $user->receive(new Message('Hello World'), $this->mockUser());
     }
 
     public function testUsersWithSameEmailAreEqual()
