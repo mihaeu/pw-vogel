@@ -84,6 +84,7 @@ class User
     public function unfollow(User $user)
     {
         $this->circleOfFriends->detach($user);
+        $this->removeTimelineEntriesFromUser($user);
         $user->removeFollower($this);
     }
 
@@ -95,7 +96,7 @@ class User
 
         foreach ($this->timeline as $time => $entry) {
             echo $entry['from']->email() . ' '
-                . date('Y-m-d H:i:s', $time) . ' '
+                . $time . ' '
                 . $entry['message'];
         }
     }
@@ -108,5 +109,15 @@ class User
     private function removeFollower(User $user)
     {
         $this->followers->detach($user);
+    }
+
+    private function removeTimelineEntriesFromUser(User $user)
+    {
+        foreach ($this->timeline as $time => $entry) {
+            if (isset($entry['from'])
+                && $user === $entry['from']) {
+                unset($this->timeline[$time]);
+            }
+        }
     }
 }

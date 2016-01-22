@@ -48,15 +48,33 @@ class UserTest extends PHPUnit_Framework_TestCase
     public function testCanViewTimeline()
     {
         $sender = new User($this->mockNickname(), $this->mockEmail('mocki@aol.com'));
+        $sender2 = new User($this->mockNickname(), $this->mockEmail('mocki2@aol.com'));
         $recipient = new User($this->mockNickname(), $this->mockEmail());
         $recipient->follow($sender);
+        $recipient->follow($sender2);
+
+        ob_start();
+        $sender->publish(new Message('Hello World'));
+        $sender2->publish(new Message('Hallo Welt'));
+        ob_clean();
+        $recipient->viewTimeline();
+        $output = ob_get_clean();
+        $this->assertRegExp('/mocki.*Hello.*mocki2.*Hallo/m', $output);
+    }
+
+    public function testNoMessagesOnTimelineFromUnfollowedUsers()
+    {
+        $user = new User($this->mockNickname(), $this->mockEmail());
+        $sender = new User($this->mockNickname(), $this->mockEmail());
+        $user->follow($sender);
 
         ob_start();
         $sender->publish(new Message('Hello World'));
         ob_clean();
-        $recipient->viewTimeline();
+        $user->unfollow($sender);
+        $user->viewTimeline();
         $output = ob_get_clean();
-        $this->assertRegExp('/mocki.*Hello/', $output);
+        $this->assertEquals('No messages', $output);
     }
 
     public function testCannotReceiveFromUsersWhoAreNotFriends()

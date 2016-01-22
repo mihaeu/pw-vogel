@@ -16,16 +16,16 @@ class Message
     /**
      * Message constructor.
      * @param String $message
-     * @param int $timestamp
+     * @param String $timestamp
      */
-    public function __construct(String $message, int $timestamp = null)
+    public function __construct(String $message, String $timestamp = null)
     {
         $this->ensureMessageIsNotTooLong($message);
 
         $this->message = $message;
 
         if (null === $timestamp) {
-            $timestamp = time();
+            $timestamp = time().microtime(false);
         }
         $this->timeCreated = $timestamp;
     }
@@ -42,7 +42,7 @@ class Message
         return $this->message;
     }
 
-    public function timeCreated() : int
+    public function timeCreated() : String
     {
         return $this->timeCreated;
     }

@@ -19,7 +19,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
 
     public function testCanSetTimeOfCreation()
     {
-        $now = time();
+        $now = time().microtime(false);
         $message = new Message('Hello World', $now);
         $this->assertEquals($now, $message->timeCreated());
     }
