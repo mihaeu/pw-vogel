@@ -9,14 +9,25 @@ class Message
     private $message;
 
     /**
+     * @var int
+     */
+    private $timeCreated;
+
+    /**
      * Message constructor.
      * @param String $message
+     * @param int $timestamp
      */
-    public function __construct(String $message)
+    public function __construct(String $message, int $timestamp = null)
     {
         $this->ensureMessageIsNotTooLong($message);
 
         $this->message = $message;
+
+        if (null === $timestamp) {
+            $timestamp = time();
+        }
+        $this->timeCreated = $timestamp;
     }
 
     private function ensureMessageIsNotTooLong(String $message)
@@ -29,6 +40,11 @@ class Message
     public function __toString() : String
     {
         return $this->message;
+    }
+
+    public function timeCreated() : int
+    {
+        return $this->timeCreated;
     }
 }
 

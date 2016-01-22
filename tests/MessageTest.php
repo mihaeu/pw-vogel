@@ -16,5 +16,12 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $message = new Message('Hello World');
         $this->assertEquals('Hello World', $message);
     }
+
+    public function testCanSetTimeOfCreation()
+    {
+        $now = time();
+        $message = new Message('Hello World', $now);
+        $this->assertEquals($now, $message->timeCreated());
+    }
 }
 

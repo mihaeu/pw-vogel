@@ -13,6 +13,16 @@ class User
     private $email;
 
     /**
+     * @var SplObjectStorage
+     */
+    private $followers;
+
+    /**
+     * @var Array
+     */
+    private $incomingMessages;
+
+    /**
      * @param Nickname $nickname
      * @param Email $email
      */
@@ -20,6 +30,22 @@ class User
     {
         $this->nickname = $nickname;
         $this->email = $email;
+
+        $this->followers = new SplObjectStorage();
+    }
+
+    public function publish(Message $message)
+    {
+        foreach ($this->followers as $follower) {
+            /** @var User $follower */
+            $follower->receive($message);
+        }
+    }
+
+    public function receive(Message $message)
+    {
+        echo $message . PHP_EOL;
+        $this->incomingMessages[$message->timeCreated()] = $message;
     }
 
     /**
@@ -37,5 +63,15 @@ class User
     public function email() : Email
     {
         return $this->email;
+    }
+
+    public function addFollower(User $user)
+    {
+        $this->followers->attach($user);
+    }
+
+    public function removeFollower(User $user)
+    {
+        $this->followers->detach($user);
     }
 }

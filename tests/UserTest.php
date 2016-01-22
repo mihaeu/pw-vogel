@@ -2,10 +2,47 @@
 
 /**
  * @covers User
+ *
+ * @uses Message
  */
 class UserTest extends PHPUnit_Framework_TestCase
 {
     use UserHelperTrait;
+
+    public function testPublishesMessageToOtherUsers()
+    {
+        $sender = new User($this->mockNickname(), $this->mockEmail());
+        $recipients = $this->mockUser();
+        $recipients->expects($this->once())->method('receive');
+
+        $message = new Message('Hello World');
+        $sender->addFollower($recipients);
+        $sender->publish($message);
+    }
+
+    public function testReceivesMessagesFromFollowingUsers()
+    {
+        $user = new User($this->mockNickname(), $this->mockEmail());
+        $sender = new User($this->mockNickname(), $this->mockEmail());
+        $sender->addFollower($user);
+
+        ob_start();
+        $sender->publish(new Message('Hello World'));
+        $output = ob_get_clean();
+        $this->assertEquals('Hello World' . PHP_EOL, $output);
+    }
+
+    public function testUnfollowedUserDoesNotReceiveMessages()
+    {
+        $sender = new User($this->mockNickname(), $this->mockEmail());
+        $recipients = $this->mockUser();
+        $recipients->expects($this->never())->method('receive');
+
+        $message = new Message('Hello World');
+        $sender->addFollower($recipients);
+        $sender->removeFollower($recipients);
+        $sender->publish($message);
+    }
 
     public function testUsersWithSameEmailAreEqual()
     {

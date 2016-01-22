@@ -7,8 +7,8 @@ spl_autoload_register(
         static $classes = null;
         if ($classes === null) {
             $classes = array(
-                'blatest' => '/BlaTest.php',
                 'emailtest' => '/EmailTest.php',
+                'messagetest' => '/MessageTest.php',
                 'nicknametest' => '/NicknameTest.php',
                 'userhelpertrait' => '/UserHelperTrait.php',
                 'usertest' => '/UserTest.php'
