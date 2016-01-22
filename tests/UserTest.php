@@ -77,6 +77,16 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('No messages', $output);
     }
 
+    public function testCannotFollowUserWhenBlacklisted()
+    {
+        $user = new User($this->mockNickname(), $this->mockEmail());
+        $badGuy = new User($this->mockNickname(), $this->mockEmail());
+        $user->addUserToBlacklist($badGuy);
+
+        $this->setExpectedException(CannotAddBlacklistedUserException::class);
+        $badGuy->follow($user);
+    }
+
     public function testCannotReceiveFromUsersWhoAreNotFriends()
     {
         $user = new User($this->mockNickname(), $this->mockEmail());

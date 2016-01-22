@@ -18,9 +18,14 @@ class User
     private $followers;
 
     /**
-     * @var Array
+     * @var array
      */
     private $timeline;
+
+    /**
+     * @var SplObjectStorage
+     */
+    private $blacklist;
 
     /**
      * @param Nickname $nickname
@@ -32,6 +37,7 @@ class User
         $this->email = $email;
 
         $this->timeline = [];
+        $this->blacklist = new SplObjectStorage();
         $this->followers = new SplObjectStorage();
         $this->circleOfFriends = new SplObjectStorage();
         $this->circleOfFriends->attach($this);
@@ -95,14 +101,25 @@ class User
         }
 
         foreach ($this->timeline as $time => $entry) {
-            echo $entry['from']->email() . ' '
+            /** @var User $fromUser */
+            $fromUser = $entry['from'];
+            echo $fromUser->email() . ' '
                 . $time . ' '
                 . $entry['message'];
         }
     }
 
+    public function addUserToBlacklist(User $user)
+    {
+        $this->blacklist->attach($user);
+    }
+
     private function addFollower(User $user)
     {
+        if ($this->blacklist->contains($user)) {
+            throw new CannotAddBlacklistedUserException();
+        }
+
         $this->followers->attach($user);
     }
 

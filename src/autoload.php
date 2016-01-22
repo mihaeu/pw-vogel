@@ -7,6 +7,7 @@ spl_autoload_register(
         static $classes = null;
         if ($classes === null) {
             $classes = array(
+                'cannotaddblacklisteduserexception' => '/CannotAddBlacklistedUserException.php',
                 'cannotsendmessagetostrangersexception' => '/CannotSendMessageToStrangersException.php',
                 'email' => '/Email.php',
                 'message' => '/Message.php',
